@@ -1,0 +1,7 @@
+{
+  "name": "ion5-calendar",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}
