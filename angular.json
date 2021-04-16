@@ -1,37 +1,38 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "defaultProject": "app",
   "newProjectRoot": "projects",
   "projects": {
-    "app": {
+    "test-app": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        },
+        "@schematics/angular:application": {
+          "strict": true
+        }
+      },
       "root": "",
       "sourceRoot": "src",
-      "projectType": "application",
       "prefix": "app",
-      "schematics": {},
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "www",
+            "outputPath": "dist/test-app",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
+            "aot": true,
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
-              },
-              {
-                "glob": "**/*.svg",
-                "input": "node_modules/ionicons/dist/ionicons/svg",
-                "output": "./svg"
-              }
+              "src/favicon.ico",
+              "src/assets"
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss"],
+            "styles": [
+              "src/styles.scss"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -46,41 +47,39 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
                 }
               ]
-            },
-            "ci": {
-              "progress": false
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "app:build"
+            "browserTarget": "test-app:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "app:build:production"
-            },
-            "ci": {
-              "progress": false
+              "browserTarget": "test-app:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "app:build"
+            "browserTarget": "test-app:build"
           }
         },
         "test": {
@@ -90,26 +89,14 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "styles": [],
-            "scripts": [],
             "assets": [
-              {
-                "glob": "favicon.ico",
-                "input": "src/",
-                "output": "/"
-              },
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "/assets"
-              }
-            ]
-          },
-          "configurations": {
-            "ci": {
-              "progress": false,
-              "watch": false
-            }
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": []
           }
         },
         "lint": {
@@ -120,60 +107,65 @@
               "tsconfig.spec.json",
               "e2e/tsconfig.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         },
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "app:serve"
+            "devServerTarget": "test-app:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "app:serve:production"
-            },
-            "ci": {
-              "devServerTarget": "app:serve:ci"
+              "devServerTarget": "test-app:serve:production"
+            }
+          }
+        }
+      }
+    },
+    "ion5-calendar": {
+      "projectType": "library",
+      "root": "projects/ion5-calendar",
+      "sourceRoot": "projects/ion5-calendar/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ion5-calendar/tsconfig.lib.json",
+            "project": "projects/ion5-calendar/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ion5-calendar/tsconfig.lib.prod.json"
             }
           }
         },
-        "ionic-cordova-build": {
-          "builder": "@ionic/angular-toolkit:cordova-build",
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "browserTarget": "app:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "app:build:production"
-            }
+            "main": "projects/ion5-calendar/src/test.ts",
+            "tsConfig": "projects/ion5-calendar/tsconfig.spec.json",
+            "karmaConfig": "projects/ion5-calendar/karma.conf.js"
           }
         },
-        "ionic-cordova-serve": {
-          "builder": "@ionic/angular-toolkit:cordova-serve",
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "cordovaBuildTarget": "app:ionic-cordova-build",
-            "devServerTarget": "app:serve"
-          },
-          "configurations": {
-            "production": {
-              "cordovaBuildTarget": "app:ionic-cordova-build:production",
-              "devServerTarget": "app:serve:production"
-            }
+            "tsConfig": [
+              "projects/ion5-calendar/tsconfig.lib.json",
+              "projects/ion5-calendar/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     }
   },
-  "cli": {
-    "defaultCollection": "@ionic/angular-toolkit"
-  },
-  "schematics": {
-    "@ionic/angular-toolkit:component": {
-      "styleext": "scss"
-    },
-    "@ionic/angular-toolkit:page": {
-      "styleext": "scss"
-    }
-  }
+  "defaultProject": "test-app"
 }

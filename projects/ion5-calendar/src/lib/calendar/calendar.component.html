@@ -1,0 +1,87 @@
+<ion-content>
+  <ion-grid class="dates-container ion-no-margin">
+    <ion-row class="header-container" *ngIf="showDays || showMonth">
+      <ion-button
+        class="arrow"
+        (click)="goToPreviousMonth()"
+        fill="clear"
+        [disabled]="!(isPrevDateValid$ | async)"
+      >
+        <ion-icon
+          slot="icon-only"
+          color="tertiary"
+          name="chevron-back-outline"
+        ></ion-icon>
+      </ion-button>
+
+      <div class="calendar-title">
+        <ion-button
+          class="ion-no-padding ion-no-margin"
+          (click)="changeType(1)"
+          expand="block"
+          fill="clear"
+          shape="round"
+          *ngIf="monthTitle"
+        >
+          {{ monthTitle }}
+        </ion-button>
+
+        <ion-button
+          class="ion-no-padding ion-no-margin"
+          (click)="changeType(2)"
+          expand="block"
+          fill="clear"
+          shape="round"
+          *ngIf="yearTitle"
+        >
+          {{ yearTitle }}
+        </ion-button>
+      </div>
+      <ion-button
+        class="arrow"
+        (click)="goToNextMonth()"
+        fill="clear"
+        [disabled]="!(isNextDateValid$ | async)"
+      >
+        <ion-icon
+          slot="icon-only"
+          color="tertiary"
+          name="chevron-forward-outline"
+        ></ion-icon>
+      </ion-button>
+    </ion-row>
+
+    <ion-row class="date-picker-container">
+      <div class="week-days" *ngIf="showDays">
+        <span *ngFor="let weekDay of weekDays">{{ weekDay }}</span>
+      </div>
+      <div
+        [class.days]="showDays"
+        [class.month]="showMonth"
+        [class.years]="showYears"
+      >
+        <ion-button
+          color="none"
+          mode="ios"
+          [class.active]="activeDateName === date.fullDate"
+          *ngFor="let date of calendarBox"
+          (click)="pickDate(date.fullDate)"
+          [disabled]="date.disabled"
+        >
+          {{ date.name }}
+        </ion-button>
+      </div>
+    </ion-row>
+
+    <ion-row class="apply-button-container">
+      <ion-button
+        color="tertiary"
+        [disabled]="isDisabled"
+        (click)="closeDataPicker()"
+        class="ion-text-capitalize compressed-button"
+      >
+        Готово
+      </ion-button>
+    </ion-row>
+  </ion-grid>
+</ion-content>

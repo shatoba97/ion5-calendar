@@ -1,0 +1,1 @@
+export const MAX_YEARS_COUNT = 10;
