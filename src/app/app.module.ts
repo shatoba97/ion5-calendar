@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { CalendarModule } from 'ion5-calendar';
-import { IonicModule } from 'projects/ion5-calendar/node_modules/@ionic/angular/ionic-angular';
+import { IonicModule } from '@ionic/angular';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -12,8 +12,8 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     CalendarModule,
+    CommonModule,
     IonicModule.forRoot(),
   ],
   providers: [],

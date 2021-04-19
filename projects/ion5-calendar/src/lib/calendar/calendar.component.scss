@@ -1,199 +1,147 @@
+/** tertiary **/
+$ion-color-tertiary: #5856d6;
+
+/** Остальные настройки **/
+$font-size: 16px;
+
+/** Основные цвета **/
+$color-light-grey: #efeff4;
+$color-grey: #e5e5ea;
+$color-dark-grey: #aaaaaf;
+$color-black: #000000;
+$color-active: #5856d6;
+$color-white: #ffffff;
+
 .dates-container {
-    min-height: 350px;
-    padding: 5px !important;
+  min-height: 350px;
+  padding: 5px !important;
+  background-color: white;
+  position: absolute;
+  width: 80%;
+  left: 50%;
+  transform: translate(-50%, 100px);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  align-items: center;
+
+  div {
+    padding: 0 12px;
+    font-size: 14px;
+    font-weight: 600;
   }
-  
-  .header-container {
-    justify-content: center;
-    align-items: center;
-  
-    div {
-      padding: 0 12px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-  
-    ion-icon {
-      font-size: 18px;
-    }
-  
-    .calendar-title {
-      min-width: 200px;
-      max-width: 200px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-  
-      ion-button {
-        margin: 0 auto;
-      }
-    }
-  
-    .arrow {
-      width: fit-content;
-      --padding-bottom: 0;
-      --padding-end: 0;
-      --padding-start: 0;
-      --padding-top: 0;
-    }
+
+  ion-icon {
+    font-size: 18px;
+    background: $ion-color-tertiary;
   }
-  
-  .date-picker-container {
+
+  .calendar-title {
+    min-width: 200px;
+    max-width: 200px;
     display: flex;
-    flex-direction: column;
-    width: 100%;
-  
-    .week-days {
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      font-size: 12px;
-      color: var(--color-dark-grey);
-      margin-bottom: 12px;
-      font-family: 'sf-pro-regular';
-    }
-  
-    .days {
-      display: grid;
-      grid-template-columns: repeat(7, auto);
-      width: 100%;
-  
-      ion-button {
-        height: 35px;
-        width: 35px;
-        border-radius: 50px;
-        background: var(--color-white);
-        --color: var(--color-black);
-  
-        &.active {
-          background: var(--color-light-grey);
-          --color: var(--color-active);
-        }
-      }
-    }
-  
-    .month,
-    .years {
-      display: grid;
-      grid-template-columns: repeat(3, auto);
-      width: 100%;
-      ion-button {
-        margin: 5px;
-        background: var(--color-white);
-        --color: var(--color-black);
-      }
-    }
-  
-    .years {
-      margin-top: 20%;
-    }
-  
-    ion-button {
-      font-family: 'sf-pro-regular';
-      letter-spacing: unset;
-      --box-shadow: none;
-      --padding-bottom: 0;
-      --padding-end: 0;
-      --padding-top: 0;
-      --padding-start: 0;
-      margin: 0;
-  
-      &.button-disabled {
-        --ion-color-contrast: var(--color-grey) !important;
-        opacity: 1;
-      }
-    }
-  }
-  
-  //////////////
-  ion-content {
-    .dates-container {
-      background-color: white;
-      position: absolute;
-      width: 80%;
-      left: 50%;
-      transform: translate(-50%, 100px);
-      border-radius: 5px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px;
-    }
-  }
-  
-  .header-container {
-    width: 100%;
-    display: flex;
+    flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 5px;
-  
-    h1 {
-      font-weight: bold;
-      font-size: 21px;
-    }
-  }
-  
-  .close-button {
-    color: var(--color-dark-grey);
-    background-color: unset;
-    align-self: start;
-    padding: 0;
-  
-    ion-icon {
-      height: 24px;
-      width: 24px;
-      position: relative;
-      bottom: 7px;
-      left: 7px;
-      outline: none;
-    }
-  }
-  
-  .inputs-container {
-    width: 100%;
-  
-    .bordered-input {
-      --padding-start: 7px;
-      width: 100%;
-      margin-bottom: 14px;
-      height: 30px;
-      ion-input {
-        height: 30px;
-        position: absolute;
-        top: -1px;
-      }
-      ion-icon {
-        position: absolute;
-        top: 10px;
-        right: 12px;
-        zoom: 0.6;
-      }
-    }
-  
-    .max-period-container {
-      font-size: 12px;
-      text-align: center;
-      span {
-        color: var(--color-dark-grey);
-      }
-  
-      ion-icon {
-        font-size: 1.3em;
-        position: relative;
-        top: 3px;
-      }
-    }
-  }
-  
-  .apply-button-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    padding: 5px;
+
     ion-button {
-      flex-grow: 0.5
+      margin: 0 auto;
     }
   }
-  
-  
+
+  .arrow {
+    width: fit-content;
+    --padding-bottom: 0;
+    --padding-end: 0;
+    --padding-start: 0;
+    --padding-top: 0;
+  }
+}
+
+.date-picker-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .week-days {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    font-size: 12px;
+    color: $color-dark-grey;
+    margin-bottom: 12px;
+  }
+
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+    width: 100%;
+
+    ion-button {
+      height: 35px;
+      width: 35px;
+      border-radius: 50px;
+      background: $color-white;
+
+      &.active {
+        background: $color-light-grey;
+        color: $color-active;
+      }
+    }
+  }
+
+  .month,
+  .years {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    width: 100%;
+    ion-button {
+      margin: 5px;
+      background: $color-white;
+      --color: $color-black;
+    }
+  }
+
+  .years {
+    margin-top: 20%;
+  }
+
+  ion-button {
+    background: white;
+    letter-spacing: unset;
+    --box-shadow: none;
+    --padding-bottom: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-start: 0;
+    margin: 0;
+    color: black;
+    
+    &.button-disabled {
+      color: rgba(0, 0, 0, 0.226);
+      --ion-color-contrast: $color-grey !important;
+      opacity: 1;
+
+    }
+  }
+}
+
+.apply-button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 5px;
+
+  ion-button {
+    background: $ion-color-tertiary;
+    flex-grow: 0.5;
+  }
+}

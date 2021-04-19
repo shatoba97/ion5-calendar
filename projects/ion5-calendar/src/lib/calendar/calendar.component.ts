@@ -25,7 +25,16 @@ export class CalendarComponent extends DestroyableBase implements OnInit {
   /* Диапазон дат в 31 день, приходит, если это это процесс для выбора даты для поля 'To' */
   /* Диапазон дат в 31 день, приходит, если это это процесс для выбора даты для поля 'To' */
   @Input()
-  dateRange!: DateRangeModelIO;
+  set dateRange(val: DateRangeModelIO) {
+    this._dateRange = val ?
+      val :
+      this._dateRange;
+  }
+
+  private _dateRange = {
+    from: undefined,
+    to: undefined,
+  } as unknown as DateRangeModelIO;
 
   /* Отсылаем выбранную дату в поле выбора диапалона дат */
   @Output() applyDate = new EventEmitter<Date>();
@@ -74,8 +83,8 @@ export class CalendarComponent extends DestroyableBase implements OnInit {
 
   /*Инициализация даты */
   public initCalendarDate(): void {
-    if (this.dateRange.from) {
-      this.pickedMonthDate = this.dateRange.from;
+    if (this._dateRange.from) {
+      this.pickedMonthDate = this._dateRange.from;
     }
   }
 
@@ -101,7 +110,7 @@ export class CalendarComponent extends DestroyableBase implements OnInit {
     }
     this.calendarBox = getCalendar(
       this.pickedMonthDate,
-      this.dateRange,
+      this._dateRange,
       this.datePickerType.currentType,
       this.dateService,
     );
@@ -116,7 +125,7 @@ export class CalendarComponent extends DestroyableBase implements OnInit {
       excludeEnd: false,
       excludeStart: false,
     };
-    
+
     this.isPrevDateValid$.next(range.contains(
       this.dateCotrol('subtract'),
       notExcludeStartAndEndDatesConst,

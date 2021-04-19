@@ -68,7 +68,7 @@ export const getCalendar = (
       nextMonthDaysAmountCutted,
       disabledButton,
     ];
-    const daysBoxArguments: dayBox[] = [
+    const daysBoxArguments = [
       prevMonthDaysBox,
       customMonthDaysBox,
       nextMonthDaysBox,
@@ -76,8 +76,8 @@ export const getCalendar = (
 
     // Заполнение календаря
     const daysBox = [] as CalendarModelIO[];
-    daysBoxArguments.forEach((monthArguments: dayBox) =>
-      {fillDaysBox(...monthArguments)},
+    daysBoxArguments.forEach((monthArguments: [number, number, boolean]) =>
+      fillDaysBox(...monthArguments),
     );
     function fillDaysBox(dayNumber: number, maxCount: number, disabled: boolean) {
       const currentMonth = !disabled;
@@ -128,7 +128,7 @@ export const getCalendar = (
           fullDate: date,
         };
       }
-      const monthBeforeCurrentDate = dateService.isBefore(null, dateService.moment(date, 'YYYY-MM'));
+      const monthBeforeCurrentDate = dateService.isBefore(undefined, dateService.moment(date, 'YYYY-MM'));
       return {
         name: monthName,
         disabled: monthBeforeCurrentDate,
@@ -154,7 +154,7 @@ export const getCalendar = (
             fullDate: year.toString(),
           };
         }
-        const monthBeforeCurentDate = dateService.isBefore(null, year);
+        const monthBeforeCurentDate = dateService.isBefore(undefined, year);
         return {
           name: year.toString(),
           disabled: monthBeforeCurentDate,

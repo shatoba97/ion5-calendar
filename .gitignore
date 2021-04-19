@@ -9,7 +9,7 @@
 
 # dependencies
 /node_modules
-*/node_modules
+/projects/ion5-calendar/node_modules
 
 
 # profiling files

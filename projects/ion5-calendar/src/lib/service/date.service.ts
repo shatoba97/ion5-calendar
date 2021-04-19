@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Moment } from 'moment';
 import { DateRange, MomentRangeStaticMethods } from 'moment-range';
-import { moment } from './moment';
+import {moment} from './moment';
+import * as Moment from 'moment';
+
 
 const momentDefaultFormat = 'YYYY-MM-DD hh:mm:ss';
 @Injectable({
@@ -13,10 +14,10 @@ export class DateService {
 
   /** */
   public moment(
-    inp?: moment.MomentInput,
-    format: moment.MomentFormatSpecification = momentDefaultFormat,
+    inp?: Moment.MomentInput,
+    format: Moment.MomentFormatSpecification = momentDefaultFormat,
     language?: string, strict?: boolean
-  ): MomentRangeStaticMethods & Moment {
+  ): MomentRangeStaticMethods & Moment.Moment {
     return moment(this.checkDate(inp), format, language, strict);
   }
 
@@ -26,7 +27,7 @@ export class DateService {
    * @param unit В чем измеряется время
    * @param date От какой даты осчитывать
    */
-  public subtract(amount: moment.DurationInputArg1, unit?: moment.DurationInputArg2, date?: moment.MomentInput,): moment.Moment {
+  public subtract(amount: Moment.DurationInputArg1, unit?: Moment.DurationInputArg2, date?: Moment.MomentInput,): Moment.Moment {
     return moment(this.checkDate(date)).subtract(amount, unit);
   }
 
@@ -36,7 +37,7 @@ export class DateService {
    * @param unit В чем измеряется время
    * @param date От какой даты осчитывать
    */
-  public add(amount: moment.DurationInputArg1, unit?: moment.DurationInputArg2, date?: moment.MomentInput): moment.Moment {
+  public add(amount: Moment.DurationInputArg1, unit?: Moment.DurationInputArg2, date?: Moment.MomentInput): Moment.Moment {
     return moment(this.checkDate(date)).add(amount, unit);
   }
 
@@ -55,8 +56,8 @@ export class DateService {
    * @param strict Строгий синтаксический анализ отключает
    *  устаревший откат к собственному конструктору Date при синтаксическом анализе строки.
    */
-  public utc(inp?: moment.MomentInput, format?: moment.MomentFormatSpecification, language?: string, strict?: boolean): moment.Moment {
-    return moment.utc(inp, strict);
+  public utc(inp?: Moment.MomentInput, format?: Moment.MomentFormatSpecification, language?: string, strict?: boolean): Moment.Moment {
+    return moment.utc(inp, format, strict);
   }
 
   /**
@@ -64,7 +65,7 @@ export class DateService {
    * @param start Стартовая дата
    * @param end  Конечная дата
    */
-  public range(start: Moment | Date, end: Moment | Date): DateRange {
+  public range(start: Moment.Moment | Date, end: Moment.Moment | Date): DateRange {
     return moment().range(start, end);
   }
 
@@ -74,7 +75,7 @@ export class DateService {
    * @param endDate  Конечная дата
    * @param granularity По какому типу сравнивать
    */
-  public isAfter(startDate: moment.MomentInput, endDate: moment.MomentInput, granularity?: moment.unitOfTime.StartOf): boolean {
+  public isAfter(startDate: Moment.MomentInput, endDate: Moment.MomentInput, granularity?: Moment.unitOfTime.StartOf): boolean {
     return moment(this.checkDate(startDate), 'YYYY-MM-DD').isAfter(this.checkDate(endDate), granularity);
   }
 
@@ -84,7 +85,7 @@ export class DateService {
    * @param endDate  Конечная дата
    * @param granularity По какому типу сравнивать
    */
-  public isBefore(startDate: moment.MomentInput, endDate: moment.MomentInput, granularity?: moment.unitOfTime.StartOf): boolean {
+  public isBefore(startDate: Moment.MomentInput, endDate: Moment.MomentInput, granularity?: Moment.unitOfTime.StartOf): boolean {
     return moment(this.checkDate(startDate), 'YYYY-MM-DD').isBefore(this.checkDate(endDate), granularity);
   }
 
@@ -94,11 +95,11 @@ export class DateService {
    * @param format Формат даты
    * @param momentFormat Формат для moment
    */
-  public getDateStringFromMoment(date: moment.MomentInput, format: string, momentFormat: string = momentDefaultFormat): string {
+  public getDateStringFromMoment(date: Moment.MomentInput, format: string, momentFormat: string = momentDefaultFormat): string {
     return moment(date, momentFormat).format(format);
   }
 
-  private checkDate(date: moment.MomentInput): MomentRangeStaticMethods & Moment | moment.MomentInput {
+  private checkDate(date: Moment.MomentInput): MomentRangeStaticMethods & Moment.Moment | Moment.MomentInput {
     return date ? date : moment();
   }
 }

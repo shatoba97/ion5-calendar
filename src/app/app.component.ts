@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CalendarComponent } from 'ion5-calendar';
-import { ModalController } from 'projects/ion5-calendar/node_modules/@ionic/angular/ionic-angular';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-root',
