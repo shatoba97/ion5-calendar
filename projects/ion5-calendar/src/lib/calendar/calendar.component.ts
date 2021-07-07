@@ -1,208 +1,115 @@
-import { Component, EventEmitter, Output, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { MAX_YEARS_COUNT } from '../const/max-years-count.const';
-import { MONTH_NAMES } from '../const/months-names.const';
-import { WEEK_DAYS } from '../const/week-days.const';
-import { DatePickerTypeEnum } from '../enum/data-picker-type.enum';
-import { CalendarModelIO } from '../model/calendar.model';
-import { DatePickerType } from '../model/date-picker-type';
-import { DateRangeModelIO } from '../model/date-range.model';
-import { DateService } from '../service/date.service';
-
-import { DestroyableBase } from '../service/destroyable-base';
-import { getCalendar } from './get-calendar';
+import { Component, Input } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
+import { DateRangeModelIO, DateService } from '../../public-api';
+import { CalendarModeEnum } from '../enum/calendar-mode.enum';
 
 
 /*Календарь компонент */
 @Component({
-  selector: 'ion5-calendar',
+  selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  providers: [DatePickerType],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CalendarComponent extends DestroyableBase implements OnInit {
-  /* Диапазон дат в 31 день, приходит, если это это процесс для выбора даты для поля 'To' */
-  /* Диапазон дат в 31 день, приходит, если это это процесс для выбора даты для поля 'To' */
-  @Input()
-  set dateRange(val: DateRangeModelIO) {
-    this._dateRange = val ?
-      val :
-      this._dateRange;
-  }
-
-  private _dateRange = {
-    from: undefined,
-    to: undefined,
-  } as unknown as DateRangeModelIO;
-
-  /* Отсылаем выбранную дату в поле выбора диапалона дат */
-  @Output() applyDate = new EventEmitter<Date>();
-
-  /* цифры для форирования календаря */
-  public calendarBox: CalendarModelIO[] = [];
-
-  /* Выбранная дата календаря */
-  public calendarDate!: Date;
-  /* Дата отображаемого месяца */
-  public pickedMonthDate: Date = new Date();
-  /* Выбранный год календаря */
-  /* Выбранный год календаря */
-  public year!: number;
-  /* Выбранный месяц календаря */
-  /* Выбранный месяц календаря */
-  public month!: number;
-  public monthTitle!: string;
-  public yearTitle!: string;
-  public weekDays!: string[];
-  public isDisabled = true;
-  public activeDateName!: string;
-
-  /* Флаг для блокировки кнопки предыдущей даты */
-  public isPrevDateValid$ = new BehaviorSubject(false);
-  /* Флаг для блокировки кнопки следующей даты */
-  public isNextDateValid$ = new BehaviorSubject(false);
+export class CalendarComponent {
 
   constructor(
-    private datePickerType: DatePickerType,
+    public modalCtrl: ModalController,
     private dateService: DateService,
-  ) {
-    super();
+    ) { }
+
+  /* Закрыть модальное окно */
+  @Input()
+  public closeModal!: (val: DateRangeModelIO) => {};
+
+  /* Возможные режимы */
+  public CalendarModeEnum = CalendarModeEnum;
+
+  /* Текущий режим */
+  public mode = this.CalendarModeEnum.selectRange;
+
+  /* Дата начала периода поиска статистики */
+  public dateFrom$ = new BehaviorSubject<string>(undefined);
+
+  /* Дата конца периода поиска статистики */
+  public dateTo$ = new BehaviorSubject<string>(undefined);
+
+  /* Диапазон возможных для выбора дат */
+  public dateRange!: DateRangeModelIO;
+
+  /*Флаг, кликабельна ли кнопка применить */
+  public isDisabled$ = combineLatest([this.dateFrom$, this.dateTo$]).pipe(
+    map(([dateFrom, dateTo]) => !(dateFrom && dateTo)),
+    startWith(true),
+  );
+
+  public isBusy$ = new BehaviorSubject(false);
+
+  /* Выбрать начало периода */
+  public openCalendarFrom(): void {
+    this.isBusy$.next(true);
+    this.dateFrom$.next(null);
+    this.mode = this.CalendarModeEnum.selectFrom;
   }
 
-  public ngOnInit() {
-    this.initCalendarDate();
-    this.initCalendar();
-    this.weekDays = WEEK_DAYS;
+  /* Выбрать конец периода */
+  public openCalendarTo(): void {
+    this.isBusy$.next(true);
+    this.mode = this.CalendarModeEnum.selectTo;
   }
 
-  /*Закрыть выбор даты */
-  public closeDataPicker() {
-    this.applyDate.emit(this.calendarDate);
+
+  /* Применить выбранные даты и закрыть модальное окно */
+  public applyDates(): void {
+    this.closeModal({
+      from: this.dateService.moment(this.dateFrom$.getValue()).toDate(),
+      to: this.dateService.moment(this.dateTo$.getValue()).toDate(),
+    });
   }
 
-  /*Инициализация даты */
-  public initCalendarDate(): void {
-    if (this._dateRange.from) {
-      this.pickedMonthDate = this._dateRange.from;
+  /* Закрыть модальное окно */
+  public close(): void {
+    this.closeModal(null);
+  }
+
+  /* Посчитать диапазон дат в 31 днень */
+  public calculateDateRange(): void {
+    const dateFromMoment = this.dateService.moment(this.dateFrom$.getValue(), 'YYYY-MM-DD');
+    const candidateDateTo = this.dateService.add(30, 'd', dateFromMoment);
+    const dateTo = candidateDateTo.isBefore(this.dateService.moment())
+        ? candidateDateTo.toDate()
+        : null;
+    this.dateRange = {
+      from: this.dateService.moment(this.dateFrom$.getValue()).toDate(),
+      to: dateTo,
     }
   }
 
-  /*Инициализация календаря */
-  public initCalendar(): void {
-    this.year = this.pickedMonthDate.getFullYear();
-    this.month = this.pickedMonthDate.getMonth();
-    switch (this.datePickerType.currentType) {
-      case DatePickerTypeEnum.Day:
-        this.monthTitle = MONTH_NAMES[this.month];
-        this.yearTitle = `${this.year} г.`;
-        this.checkValidOfControlButtons();
-        break;
-      case DatePickerTypeEnum.Month:
-        this.monthTitle = '';
-        this.yearTitle = `${this.year} г.`;
-        this.checkValidOfControlButtons();
-        break;
-      case DatePickerTypeEnum.Year:
-        this.monthTitle = '';
-        this.yearTitle = '';
-        break;
-    }
-    this.calendarBox = getCalendar(
-      this.pickedMonthDate,
-      this._dateRange,
-      this.datePickerType.currentType,
-      this.dateService,
-    );
+  /* Применить выбранные даты к полю 'From' */
+  public applyDateFrom(date: Date): void {
+    this.dateFrom$.next(this.dateService.getDateStringFromMoment(date, 'YYYY-MM-DD', 'YYYY-MM-DD'));
+    this.dateTo$.next(undefined);
+    this.mode = this.CalendarModeEnum.selectRange;
+    this.isBusy$.next(false);
+    this.calculateDateRange();
   }
 
-  /*Проверка валидности кнопок переключения даты */
-  public checkValidOfControlButtons(): void {
-    const firstValidDate = this.dateService.moment().subtract(MAX_YEARS_COUNT - 1, 'years').startOf('year');
-    const lastValidDate = this.dateService.moment().add(1, 'day');
-    const range = this.dateService.range(firstValidDate, lastValidDate);
-    const notExcludeStartAndEndDatesConst = {
-      excludeEnd: false,
-      excludeStart: false,
+  /* Применить выбранные даты к полю 'To' */
+  public applyDateTo(date: Date): void {
+    this.dateTo$.next(this.dateService.getDateStringFromMoment(date, 'YYYY-MM-DD', 'YYYY-MM-DD'));
+    this.mode = this.CalendarModeEnum.selectRange;
+    this.isBusy$.next(false);
+  }
+
+  public get dateRangeFrom(): DateRangeModelIO {
+    const dateFrom = this.dateFrom$.getValue()
+      ? this.dateService.moment(this.dateFrom$.getValue(), 'YYYY-MM-DD').toDate()
+      : null;
+
+    return {
+      from: dateFrom,
+      to: null
     };
-
-    this.isPrevDateValid$.next(range.contains(
-      this.dateCotrol('subtract'),
-      notExcludeStartAndEndDatesConst,
-    ));
-    this.isNextDateValid$.next(range.contains(
-      this.dateCotrol('add'),
-      notExcludeStartAndEndDatesConst,
-    ));
   }
-
-  /*Дата выбрана */
-  public pickDate(name: string): void {
-    this.calendarDate = this.dateService.moment(name, 'YYYY-MM-DD').toDate();
-    this.activeDateName = name;
-    switch (this.datePickerType.currentType) {
-      case DatePickerTypeEnum.Year:
-        this.pickedMonthDate = this.calendarDate;
-        this.datePickerType.dateType(DatePickerTypeEnum.Month);
-        this.initCalendar();
-        break;
-      case DatePickerTypeEnum.Month:
-        this.pickedMonthDate = this.calendarDate;
-        this.datePickerType.dateType(DatePickerTypeEnum.Day);
-        this.initCalendar();
-        break;
-      default:
-        this.isDisabled = false;
-    }
-  }
-
-  /*Предыдущий период */
-  public goToPreviousMonth(): void {
-    this.pickedMonthDate = this.dateCotrol('subtract');
-
-    this.initCalendar();
-  }
-
-  /*Следующий период */
-  public goToNextMonth(): void {
-    this.pickedMonthDate = this.dateCotrol('add');
-    this.initCalendar();
-  }
-
-  /*Метод для получения следующего/предыдущего месяца/года */
-  private dateCotrol(operation: 'add' | 'subtract'): Date {
-    const count = operation === 'add' ? 1 : -1;
-    if (this.showMonth) {
-      return this.dateService.moment(`${this.year + count} 1`, 'YYYY-MM-DD').toDate();
-    } else {
-      const calendarMonth = operation === 'add' ? this.month === 11 : this.month === 0;
-      if (calendarMonth) {
-        const month = operation === 'add' ? 1 : 12;
-        return this.dateService.moment(`${this.year + count} ${month}`, 'YYYY-MM-DD').toDate();
-      } else {
-        return this.dateService.moment(`${this.year} ${this.month + 1 + count}`, 'YYYY-MM-DD').toDate();
-      }
-    }
-  }
-
-  /*Изменение отображаемого типа */
-  public changeType(type: number): void {
-    this.datePickerType.dateType(type);
-    this.initCalendar();
-  }
-
-  /*Текущий отображаемы тип дунь */
-  public get showDays(): boolean {
-    return this.datePickerType.currentType === DatePickerTypeEnum.Day;
-  }
-
-  /*Текущий отображаемы тип месяц */
-  public get showMonth(): boolean {
-    return this.datePickerType.currentType === DatePickerTypeEnum.Month;
-  }
-
-  /*Текущий отображаемы тип год */
-  public get showYears(): boolean {
-    return this.datePickerType.currentType === DatePickerTypeEnum.Year;
-  }
-}
+ }

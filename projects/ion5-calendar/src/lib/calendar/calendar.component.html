@@ -1,87 +1,55 @@
 <ion-content>
-  <ion-grid class="dates-container ion-no-margin">
-    <ion-row class="header-container" *ngIf="showDays || showMonth">
-      <ion-button
-        class="arrow"
-        (click)="goToPreviousMonth()"
-        fill="clear"
-        [disabled]="!(isPrevDateValid$ | async)"
-      >
-        <ion-icon
-          slot="icon-only"
-          color="tertiary"
-          name="chevron-back-outline"
-        ></ion-icon>
-      </ion-button>
 
-      <div class="calendar-title">
-        <ion-button
-          class="ion-no-padding ion-no-margin"
-          (click)="changeType(1)"
-          expand="block"
-          fill="clear"
-          shape="round"
-          *ngIf="monthTitle"
-        >
-          {{ monthTitle }}
-        </ion-button>
+  <ion-grid *ngIf="mode === CalendarModeEnum.selectRange" class="dates-container">
 
-        <ion-button
-          class="ion-no-padding ion-no-margin"
-          (click)="changeType(2)"
-          expand="block"
-          fill="clear"
-          shape="round"
-          *ngIf="yearTitle"
-        >
-          {{ yearTitle }}
-        </ion-button>
-      </div>
-      <ion-button
-        class="arrow"
-        (click)="goToNextMonth()"
-        fill="clear"
-        [disabled]="!(isNextDateValid$ | async)"
-      >
-        <ion-icon
-          slot="icon-only"
-          color="tertiary"
-          name="chevron-forward-outline"
-        ></ion-icon>
-      </ion-button>
+    <ion-row class="header-container">
+      <h1>Выбрать период</h1>
+      <button class="close-button">
+        <ion-icon (click)="close()" name="close-outline"></ion-icon>
+      </button>
     </ion-row>
 
-    <ion-row class="date-picker-container">
-      <div class="week-days" *ngIf="showDays">
-        <span *ngFor="let weekDay of weekDays">{{ weekDay }}</span>
-      </div>
-      <div
-        [class.days]="showDays"
-        [class.month]="showMonth"
-        [class.years]="showYears"
-      >
-        <ion-button
-          color="none"
-          mode="ios"
-          [class.active]="activeDateName === date.fullDate"
-          *ngFor="let date of calendarBox"
-          (click)="pickDate(date.fullDate)"
-          [disabled]="date.disabled"
-        >
-          {{ date.name }}
-        </ion-button>
-      </div>
+    <ion-row class="inputs-container">
+      <ion-item class='bordered-input' lines="none">
+        <ion-input readonly="true" placeholder="Начало периода" type="text"
+          [value]="dateFrom$ | async | date: 'mediumDate'" (ionFocus)="openCalendarFrom()" [disabled]="isBusy$ | async">
+        </ion-input>
+        <ion-icon color="tertiary" src="../../../../assets/icon/calendar.svg"></ion-icon>
+      </ion-item>
+
+      <ion-item class='bordered-input' lines="none">
+        <ion-input readonly="true" [disabled]="!(dateFrom$ | async) || (isBusy$ | async)" placeholder="Конец периода"
+          type="text" [value]="dateTo$ | async | date: 'mediumDate'" (ionFocus)="openCalendarTo()">
+        </ion-input>
+        <ion-icon color="tertiary" src="../../../../assets/icon/calendar.svg"></ion-icon>
+      </ion-item>
+
+      <ion-col class='max-period-container' lines="none">
+        <ion-icon color="danger" name="alert-circle-outline"></ion-icon>
+        <span>
+          Максимальный период:
+        </span>
+        <b>31</b>
+        <span>
+          календарный день.
+        </span>
+      </ion-col>
     </ion-row>
 
-    <ion-row class="apply-button-container">
-      <ion-button
-        color="tertiary"
-        [disabled]="isDisabled"
-        (click)="closeDataPicker()"
-        class="ion-text-capitalize compressed-button"
-      >
-        Готово
-      </ion-button>
+    <ion-row class='apply-button-container'>
+      <ion-button color="tertiary" [disabled]="isDisabled$ | async" (click)="applyDates()"
+        class="ion-text-capitalize compressed-button">Применить</ion-button>
     </ion-row>
+
   </ion-grid>
+
+  <app-date-picker *ngIf="mode === CalendarModeEnum.selectFrom"
+                   [dateRange]="dateRangeFrom"
+                   (applyDate)="applyDateFrom($event)">
+  </app-date-picker>
+
+  <app-date-picker *ngIf="mode === CalendarModeEnum.selectTo" [dateRange]="dateRange"
+    (applyDate)="applyDateTo($event)">
+  </app-date-picker>
+
 </ion-content>
